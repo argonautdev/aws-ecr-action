@@ -21,8 +21,14 @@ function main() {
   aws_configure
   assume_role
   login
-  run_pre_build_script $INPUT_PREBUILD_SCRIPT
-  docker_build $INPUT_TAGS $ACCOUNT_URL
+  if [ "$INPUT_DOCKER_IMAGE_PATH" == "/tmp" ]; then
+    run_pre_build_script $INPUT_PREBUILD_SCRIPT
+    docker_build $INPUT_TAGS $ACCOUNT_URL
+  elif [ "$INPUT_DOCKER_IMAGE_PATH" != "/tmp" ]; then
+    echo "image path $INPUT_DOCKER_IMAGE_PATH"
+    docker_load_from_tar $INPUT_TAGS $ACCOUNT_URL $INPUT_DOCKER_IMAGE_PATH
+  fi
+
   create_ecr_repo $INPUT_CREATE_REPO
   set_ecr_repo_policy $INPUT_SET_REPO_POLICY
   put_image_scanning_configuration $INPUT_IMAGE_SCANNING_CONFIGURATION
@@ -143,6 +149,12 @@ function docker_build() {
 
   docker build $INPUT_EXTRA_BUILD_ARGS -f $INPUT_DOCKERFILE $docker_tag_args $INPUT_PATH
   echo "== FINISHED DOCKERIZE"
+}
+
+function docker_load_from_tar() {
+  echo "== START DOCKER LOAD FROM TAR"
+  docker load --input $3
+  echo "== FINISHED DOCKER LOAD FROM TAR"
 }
 
 function docker_push_to_ecr() {
