@@ -103,7 +103,7 @@ function set_ecr_repo_policy() {
   if [ "${1}" = true ]; then
     echo "== START SET REPO POLICY"
     if [ -f "${INPUT_REPO_POLICY_FILE}" ]; then
-      aws ecr set-repository-policy --repository-name $INPUT_REPO --policy-text file://"${INPUT_REPO_POLICY_FILE}"
+      aws ecr set-repository-policy --region $AWS_DEFAULT_REGION --repository-name $INPUT_REPO --policy-text file://"${INPUT_REPO_POLICY_FILE}"
       echo "== FINISHED SET REPO POLICY"
     else
       echo "== REPO POLICY FILE (${INPUT_REPO_POLICY_FILE}) DOESN'T EXIST. SKIPPING.."
@@ -115,7 +115,7 @@ function put_image_scanning_configuration() {
   if [ "${1}" = true ]; then
       echo "== START SET IMAGE SCANNING CONFIGURATION"
     if [ "${INPUT_IMAGE_SCANNING_CONFIGURATION}" = true ]; then
-      aws ecr put-image-scanning-configuration --repository-name $INPUT_REPO --image-scanning-configuration scanOnPush=${INPUT_IMAGE_SCANNING_CONFIGURATION}
+      aws ecr put-image-scanning-configuration --region $AWS_DEFAULT_REGION --repository-name $INPUT_REPO --image-scanning-configuration scanOnPush=${INPUT_IMAGE_SCANNING_CONFIGURATION}
       echo "== FINISHED SET IMAGE SCANNING CONFIGURATION"
     fi
   fi
